@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Bell, Zap, User, Activity, LineChart, Terminal, SlidersHorizontal } from 'lucide-react';
+import { ShieldCheck, Bell, Zap, Activity, LineChart, Terminal, SlidersHorizontal } from 'lucide-react';
 
 export default function Header({ 
   activeTab, 
@@ -17,34 +17,34 @@ export default function Header({
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-stone-800/80 bg-stone-950/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 w-full border-b border-orange-100/80 bg-white/85 backdrop-blur-xl transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20 gap-4">
           
           {/* Brand Logo & Tag */}
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('dashboard')}>
-            <div className="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-rose-500 via-red-600 to-orange-600 shadow-lg shadow-rose-900/40 border border-rose-400/30 group">
+            <div className="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-orange-400 via-orange-500 to-amber-500 shadow-md shadow-orange-500/20 border border-orange-200 group">
               <ShieldCheck className="w-6 h-6 text-white transition-transform group-hover:scale-110 duration-300" />
               <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
               </span>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-stone-100 to-rose-200 bg-clip-text text-transparent font-['Outfit']">
-                  SafeSpend<span className="text-rose-500">.ai</span>
+                <span className="font-extrabold text-xl tracking-tight text-stone-900 font-sora">
+                  SafeSpend<span className="text-orange-500">.ai</span>
                 </span>
-                <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-rose-950/80 text-rose-300 border border-rose-700/40">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-orange-50 text-orange-600 border border-orange-200/80 font-mono">
                   Autonomous Engine
                 </span>
               </div>
-              <p className="text-xs text-stone-400 hidden sm:block">Proactive Liquidity & Defense Architecture</p>
+              <p className="text-xs text-stone-500 font-medium hidden sm:block font-sans">Proactive Liquidity & Defense Architecture</p>
             </div>
           </div>
 
           {/* Centered Pill Capsule Menu */}
-          <nav className="hidden md:flex items-center p-1.5 rounded-full bg-stone-900/90 border border-stone-800 shadow-inner">
+          <nav className="hidden md:flex items-center p-1.5 rounded-full bg-stone-100/80 border border-stone-200/60 shadow-inner">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -52,13 +52,13 @@ export default function Header({
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 ${
                     isActive
-                      ? 'bg-gradient-to-r from-rose-900 via-red-900 to-orange-950 text-white shadow-md shadow-rose-950/60 border border-rose-700/40 font-semibold'
-                      : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/60'
+                      ? 'bg-white text-orange-600 shadow-sm border border-orange-200/80 font-bold'
+                      : 'text-stone-600 hover:text-stone-900 hover:bg-white/60'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-rose-400' : 'text-stone-400'}`} />
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-orange-500' : 'text-stone-400'}`} />
                   {item.label}
                 </button>
               );
@@ -71,9 +71,9 @@ export default function Header({
             <button
               onClick={onResetDemo}
               title="Reset metrics to pristine baseline"
-              className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-stone-900 hover:bg-stone-800 text-stone-300 hover:text-white border border-stone-700/60 hover:border-rose-500/50 text-xs font-semibold shadow-sm transition-all duration-200 active:scale-95 group"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-orange-50 hover:bg-orange-100/80 text-orange-700 border border-orange-200/80 text-xs font-bold shadow-sm transition-all duration-200 active:scale-95 group font-sans"
             >
-              <Zap className="w-3.5 h-3.5 text-amber-400 group-hover:rotate-12 transition-transform duration-300" />
+              <Zap className="w-3.5 h-3.5 text-orange-500 group-hover:rotate-12 transition-transform duration-300" />
               <span className="hidden sm:inline">Reset Demo</span>
               <span className="sm:hidden">Reset</span>
             </button>
@@ -81,29 +81,29 @@ export default function Header({
             {/* Notification Bell with alert badge */}
             <button
               onClick={onOpenNotifications}
-              className="relative p-2.5 rounded-full bg-stone-900 hover:bg-stone-800 text-stone-300 hover:text-white border border-stone-800 hover:border-stone-700 transition-colors"
+              className="relative p-2.5 rounded-full bg-stone-50 hover:bg-stone-100 text-stone-600 hover:text-stone-900 border border-stone-200/80 transition-colors"
               aria-label="View notifications"
             >
               <Bell className="w-4 h-4" />
               {hasAlert && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[9px] font-bold text-white ring-2 ring-stone-950 animate-bounce">
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[9px] font-bold text-white ring-2 ring-white animate-bounce">
                   {alertCount || '!'}
                 </span>
               )}
             </button>
 
             {/* Profile Avatar */}
-            <div className="flex items-center gap-2.5 pl-2 border-l border-stone-800">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-500 via-rose-600 to-red-600 p-[2px] shadow-sm">
-                <div className="w-full h-full rounded-full bg-stone-950 flex items-center justify-center text-xs font-bold text-amber-300">
+            <div className="flex items-center gap-2.5 pl-2 border-l border-stone-200">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-orange-400 via-amber-400 to-orange-500 p-[2px] shadow-sm">
+                <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-xs font-bold text-orange-600 font-sora">
                   RA
                 </div>
               </div>
               <div className="hidden lg:block text-left">
-                <p className="text-xs font-semibold text-stone-200 leading-tight">Rahul A.</p>
-                <p className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Online
+                <p className="text-xs font-bold text-stone-800 leading-tight font-sora">Rahul A.</p>
+                <p className="text-[10px] text-emerald-600 font-mono flex items-center gap-1 font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Active Shield
                 </p>
               </div>
             </div>

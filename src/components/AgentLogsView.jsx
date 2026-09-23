@@ -1,5 +1,5 @@
 import React from 'react';
-import { Terminal, Shield, CheckCircle, AlertTriangle, Cpu, Clock, RefreshCw } from 'lucide-react';
+import { Terminal } from 'lucide-react';
 
 export default function AgentLogsView({ logs }) {
   return (
@@ -8,36 +8,36 @@ export default function AgentLogsView({ logs }) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-rose-400">
-            <Terminal className="w-4 h-4 text-rose-400" />
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-orange-600 font-mono">
+            <Terminal className="w-4 h-4 text-orange-500" />
             Autonomous Decision Audit
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight font-['Outfit'] mt-1">
+          <h1 className="text-2xl font-extrabold text-stone-900 tracking-tight font-sora mt-1">
             Agent Audit Log & Decision Trace
           </h1>
-          <p className="text-xs text-stone-400">Immutable, verifiable reasoning traces for every liquidity decision</p>
+          <p className="text-xs text-stone-500 font-sans">Immutable, verifiable reasoning traces for every liquidity decision</p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="px-3 py-1.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-600/40 text-xs font-mono flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <div className="px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-mono font-bold flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             Guardian Engine v2.4 Live
           </div>
         </div>
       </div>
 
       {/* Terminal-style Log Box */}
-      <div className="rounded-3xl bg-stone-900/90 border border-stone-800 shadow-2xl p-6 font-mono text-xs overflow-hidden backdrop-blur-xl">
+      <div className="rounded-3xl bg-white border border-orange-100 shadow-luxury p-6 font-mono text-xs overflow-hidden backdrop-blur-xl">
         
         {/* Terminal top bar */}
-        <div className="flex items-center justify-between border-b border-stone-800 pb-3 mb-4">
+        <div className="flex items-center justify-between border-b border-stone-100 pb-3 mb-4">
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-rose-600/80"></span>
-            <span className="w-3 h-3 rounded-full bg-amber-500/80"></span>
-            <span className="w-3 h-3 rounded-full bg-emerald-500/80"></span>
-            <span className="ml-2 text-stone-400 text-[11px]">safespend-agent-daemon / trace.log</span>
+            <span className="w-3 h-3 rounded-full bg-orange-500"></span>
+            <span className="w-3 h-3 rounded-full bg-amber-400"></span>
+            <span className="w-3 h-3 rounded-full bg-emerald-500"></span>
+            <span className="ml-2 text-stone-600 text-[11px] font-bold">safespend-agent-daemon / trace.log</span>
           </div>
-          <span className="text-[10px] text-stone-500">Autonomous Level 4</span>
+          <span className="text-[10px] text-stone-400 font-bold">Autonomous Level 4</span>
         </div>
 
         {/* Log Entries */}
@@ -49,33 +49,33 @@ export default function AgentLogsView({ logs }) {
             return (
               <div
                 key={idx}
-                className={`p-3 rounded-xl border flex flex-col sm:flex-row sm:items-start justify-between gap-3 ${
+                className={`p-3.5 rounded-xl border flex flex-col sm:flex-row sm:items-start justify-between gap-3 ${
                   isWarn
-                    ? 'bg-rose-950/30 border-rose-800/50 text-rose-200'
+                    ? 'bg-orange-50/80 border-orange-200 text-stone-800'
                     : isSuccess
-                    ? 'bg-emerald-950/30 border-emerald-800/50 text-emerald-200'
-                    : 'bg-stone-950/60 border-stone-800/80 text-stone-300'
+                    ? 'bg-emerald-50/80 border-emerald-200 text-stone-800'
+                    : 'bg-stone-50 border-stone-200 text-stone-700'
                 }`}
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-stone-400">[{log.timestamp}]</span>
-                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                    <span className="text-[10px] text-stone-500">[{log.timestamp}]</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
                       isWarn
-                        ? 'bg-rose-900 text-rose-200'
+                        ? 'bg-orange-600 text-white'
                         : isSuccess
-                        ? 'bg-emerald-900 text-emerald-200'
-                        : 'bg-stone-800 text-stone-300'
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-stone-200 text-stone-800'
                     }`}>
                       {log.level}
                     </span>
-                    <span className="font-semibold text-stone-100">{log.action}</span>
+                    <span className="font-bold text-stone-900 font-sora">{log.action}</span>
                   </div>
-                  <p className="text-[11px] font-sans text-stone-300 pl-2 sm:pl-0">{log.details}</p>
+                  <p className="text-[11px] font-sans text-stone-600 pl-2 sm:pl-0">{log.details}</p>
                 </div>
 
-                <div className="text-[10px] text-stone-400 shrink-0 font-mono">
-                  Confidence: <span className="text-white font-bold">{log.confidence || '94.8%'}</span>
+                <div className="text-[10px] text-stone-500 shrink-0 font-mono">
+                  Confidence: <span className="text-stone-900 font-bold">{log.confidence || '94.8%'}</span>
                 </div>
               </div>
             );

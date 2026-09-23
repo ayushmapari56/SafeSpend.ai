@@ -1,5 +1,5 @@
 import React from 'react';
-import { CalendarClock, CheckCircle, PauseCircle, AlertCircle } from 'lucide-react';
+import { CalendarClock } from 'lucide-react';
 
 export default function CommitmentsCard({ commitments, isOttPaused, splitPaymentActive }) {
   const totalCommitted = commitments.reduce((acc, curr) => {
@@ -9,23 +9,23 @@ export default function CommitmentsCard({ commitments, isOttPaused, splitPayment
   }, 0);
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-stone-900/80 border border-stone-800 p-6 md:p-7 shadow-xl backdrop-blur-xl transition-all duration-300 hover:border-stone-700 flex flex-col justify-between">
+    <div className="relative overflow-hidden rounded-3xl bg-white border border-orange-100/90 p-6 md:p-7 shadow-luxury backdrop-blur-xl transition-all duration-300 hover:shadow-luxury-hover hover:border-orange-200 flex flex-col justify-between">
       <div>
         
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-400">
+            <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-orange-600 font-mono">
               <CalendarClock className="w-3.5 h-3.5" />
               Fixed Liabilities (E<sub>committed</sub>)
             </div>
-            <h3 className="text-base font-bold text-white tracking-tight font-['Outfit'] mt-0.5">
+            <h3 className="text-base font-extrabold text-stone-900 tracking-tight font-sora mt-0.5">
               Upcoming Commitments
             </h3>
           </div>
           <div className="text-right">
-            <span className="text-[10px] text-stone-400 block">Total Due (14d)</span>
-            <span className="text-sm font-bold font-mono text-white">₹{totalCommitted.toLocaleString('en-IN')}</span>
+            <span className="text-[10px] text-stone-500 font-semibold uppercase tracking-wider block font-mono">Total Due (14d)</span>
+            <span className="text-base font-bold font-space text-stone-900">₹{totalCommitted.toLocaleString('en-IN')}</span>
           </div>
         </div>
 
@@ -41,43 +41,43 @@ export default function CommitmentsCard({ commitments, isOttPaused, splitPayment
                 key={item.id}
                 className={`p-3 rounded-2xl border transition-all duration-200 flex items-center justify-between gap-3 ${
                   isPaused
-                    ? 'bg-stone-950/40 border-stone-800/60 opacity-60'
+                    ? 'bg-stone-50 border-stone-200 opacity-60'
                     : isSplit
-                    ? 'bg-blue-950/20 border-blue-800/40'
-                    : 'bg-stone-900/60 border-stone-800 hover:border-stone-700'
+                    ? 'bg-orange-50/60 border-orange-200'
+                    : 'bg-stone-50/60 border-stone-200 hover:border-orange-200 hover:bg-orange-50/30'
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <div className={`w-2 h-2 rounded-full ${
-                    isPaused ? 'bg-stone-600' : isSplit ? 'bg-blue-400' : 'bg-rose-500'
+                  <div className={`w-2.5 h-2.5 rounded-full ${
+                    isPaused ? 'bg-stone-400' : isSplit ? 'bg-orange-500' : 'bg-orange-500'
                   }`} />
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className={`text-xs font-semibold ${isPaused ? 'line-through text-stone-500' : 'text-stone-200'}`}>
+                      <span className={`text-xs font-bold ${isPaused ? 'line-through text-stone-400' : 'text-stone-800'}`}>
                         {item.name}
                       </span>
                       {isPaused && (
-                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-950/80 text-amber-300 border border-amber-800/50 font-semibold">
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 border border-amber-300 font-bold font-mono">
                           Paused
                         </span>
                       )}
                       {isSplit && (
-                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-blue-950/80 text-blue-300 border border-blue-800/50 font-semibold">
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-orange-100 text-orange-800 border border-orange-300 font-bold font-mono">
                           Split (Part 1/2)
                         </span>
                       )}
                     </div>
-                    <span className="text-[10px] text-stone-400">
+                    <span className="text-[10px] text-stone-500 font-sans">
                       Due: {item.dueDate} • {item.category}
                     </span>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <span className={`text-xs font-bold font-mono block ${isPaused ? 'text-stone-500 line-through' : 'text-stone-100'}`}>
+                  <span className={`text-xs font-bold font-space block ${isPaused ? 'text-stone-400 line-through' : 'text-stone-900'}`}>
                     ₹{displayAmount.toLocaleString('en-IN')}
                   </span>
-                  <span className="text-[9px] text-stone-400">
+                  <span className="text-[9px] text-stone-500 font-sans">
                     {item.autoDebit ? 'Auto-debit' : 'Manual'}
                   </span>
                 </div>
@@ -88,9 +88,9 @@ export default function CommitmentsCard({ commitments, isOttPaused, splitPayment
 
       </div>
 
-      <div className="mt-4 pt-3 border-t border-stone-800 text-[10px] text-stone-400 flex items-center justify-between">
-        <span>Autonomous payment escrow ready</span>
-        <span className="text-emerald-400 font-mono">100% On-Time Target</span>
+      <div className="mt-4 pt-3 border-t border-stone-100 text-[10px] text-stone-500 flex items-center justify-between font-sans">
+        <span>Autonomous payment escrow active</span>
+        <span className="text-emerald-600 font-mono font-bold">100% On-Time Target</span>
       </div>
 
     </div>

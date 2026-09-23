@@ -16,7 +16,7 @@ import {
   INITIAL_INCOMES, 
   calculate14DayProjection 
 } from './data/initialState';
-import { Sparkles, Bell, CheckCircle, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function App() {
@@ -141,7 +141,6 @@ export default function App() {
   // Handler: Inject 5-day stipend delay
   const handleInjectDelay = () => {
     if (incomeDelayDays > 0) {
-      // Toggle off
       setIncomeDelayDays(0);
       showToast('Stipend delay removed. Expected date restored to Oct 3.');
       addLog('INFO', 'DELAY_REVERTED', 'College stipend arrival date reverted to Oct 3 baseline.');
@@ -160,7 +159,6 @@ export default function App() {
   // Handler: Add ₹3,500 emergency expense shock
   const handleInjectShock = () => {
     if (expenseShockAmount > 0) {
-      // Toggle off
       setLiquidBalance((prev) => prev + expenseShockAmount);
       setExpenseShockAmount(0);
       showToast('Expense shock removed. Liquid balance restored.');
@@ -263,7 +261,7 @@ export default function App() {
       setLiquidBalance(10750);
       setIsOttPaused(true);
       setSplitPaymentActive(true);
-      confetti({ particleCount: 70, spread: 60 });
+      confetti({ particleCount: 70, spread: 60, colors: ['#f97316', '#10b981'] });
       showToast('Loaded Scenario 3: Autonomous Defense Active');
     }
   };
@@ -271,12 +269,12 @@ export default function App() {
   const alertCount = notifications.filter((n) => n.type === 'warning').length;
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col font-sans selection:bg-rose-500 selection:text-white pb-16">
+    <div className="min-h-screen bg-[#faf9f6] text-stone-900 flex flex-col font-sans selection:bg-orange-400 selection:text-white pb-16">
       
       {/* Toast Notification Alert */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-stone-900 border border-rose-500/50 text-white shadow-2xl text-xs font-semibold backdrop-blur-xl animate-fade-in">
-          <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-white border border-orange-300 text-stone-900 shadow-2xl text-xs font-bold backdrop-blur-xl animate-fade-in font-sora">
+          <Sparkles className="w-4 h-4 text-orange-500 shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -297,18 +295,18 @@ export default function App() {
         {/* Welcome & Subtitle Banner */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-['Outfit'] flex items-center gap-2.5">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-stone-900 font-sora flex items-center gap-2.5">
               Welcome Back, Rahul!
-              <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm animate-pulse"></span>
+              <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm animate-pulse"></span>
             </h1>
-            <p className="text-xs sm:text-sm text-stone-400 mt-1">
+            <p className="text-xs sm:text-sm text-stone-500 mt-1 font-sans font-medium">
               Proactive Liquidity & Safe-to-Spend Protection Engine
             </p>
           </div>
 
-          <div className="flex items-center gap-2 self-start sm:self-auto">
-            <span className="text-xs text-stone-400 font-mono">Live Simulation Active</span>
-            <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+          <div className="flex items-center gap-2 self-start sm:self-auto px-3 py-1.5 rounded-full bg-white border border-orange-100 shadow-sm">
+            <span className="text-xs text-stone-600 font-mono font-bold">Live Simulation Active</span>
+            <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
           </div>
         </div>
 
@@ -316,7 +314,7 @@ export default function App() {
         {activeTab === 'dashboard' && (
           <div className="space-y-6 sm:space-y-8 animate-fade-in">
             
-            {/* Top Row Grid: Two Large Feature Gradient Cards */}
+            {/* Top Row Grid: Two Large Feature Cards */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
               {/* Left Card: 14-Day Safe-to-Spend Forecast Chart */}
