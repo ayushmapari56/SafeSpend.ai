@@ -10,6 +10,7 @@ import AgentLogsView from './components/AgentLogsView';
 import SimulatorView from './components/SimulatorView';
 import SplitPaymentModal from './components/SplitPaymentModal';
 import NotificationModal from './components/NotificationModal';
+import CardFanHero from './components/CardFanHero';
 import { 
   BASELINE_STATE, 
   INITIAL_COMMITMENTS, 
@@ -20,7 +21,7 @@ import { Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('hero');
   
   // Core simulation state
   const [liquidBalance, setLiquidBalance] = useState(BASELINE_STATE.liquidBalance);
@@ -268,13 +269,17 @@ export default function App() {
 
   const alertCount = notifications.filter((n) => n.type === 'warning').length;
 
+  if (activeTab === 'hero') {
+    return <CardFanHero onExploreClick={() => setActiveTab('dashboard')} />;
+  }
+
   return (
-    <div className="min-h-screen bg-[#faf9f6] text-stone-900 flex flex-col font-sans selection:bg-orange-400 selection:text-white pb-16">
+    <div className="min-h-screen bg-[#fafaf8] text-[#0F0F0C] flex flex-col font-sans selection:bg-[#A3F574] selection:text-[#163701] pb-16">
       
       {/* Toast Notification Alert */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-white border border-orange-300 text-stone-900 shadow-2xl text-xs font-bold backdrop-blur-xl animate-fade-in font-sora">
-          <Sparkles className="w-4 h-4 text-orange-500 shrink-0" />
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-full bg-[#163701] text-[#A3F574] shadow-2xl text-xs font-bold backdrop-blur-xl animate-fade-in font-sans border border-[#A3F574]/30">
+          <Sparkles className="w-4 h-4 text-[#A3F574] shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -295,18 +300,18 @@ export default function App() {
         {/* Welcome & Subtitle Banner */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-stone-900 font-sora flex items-center gap-2.5">
+            <h1 className="text-2xl sm:text-3xl font-archivo uppercase tracking-tight text-[#163701] flex items-center gap-2.5">
               Welcome Back, Rahul!
-              <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm animate-pulse"></span>
+              <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#A3F574] shadow-sm animate-pulse ring-4 ring-[#163701]/10"></span>
             </h1>
-            <p className="text-xs sm:text-sm text-stone-500 mt-1 font-sans font-medium">
+            <p className="text-xs sm:text-sm text-[#0F0F0C]/70 mt-1 font-sans font-medium">
               Proactive Liquidity & Safe-to-Spend Protection Engine
             </p>
           </div>
 
-          <div className="flex items-center gap-2 self-start sm:self-auto px-3 py-1.5 rounded-full bg-white border border-orange-100 shadow-sm">
-            <span className="text-xs text-stone-600 font-mono font-bold">Live Simulation Active</span>
-            <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
+          <div className="flex items-center gap-2 self-start sm:self-auto px-4 py-1.5 rounded-full bg-[#A3F574] text-[#163701] border border-[#163701]/20 shadow-sm font-sans">
+            <span className="text-xs font-bold">Live Sentinel Active</span>
+            <span className="w-2 h-2 rounded-full bg-[#163701] animate-ping"></span>
           </div>
         </div>
 

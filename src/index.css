@@ -1,52 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
+  --lime: #A3F574;
+  --forest: #163701;
+  --ink: #0F0F0C;
+  --white: #FFFFFF;
+  --radius-card: 28px;
+  --radius-pill: 999px;
 }
 
 body {
+  font-family: 'Inter', sans-serif;
+  color: var(--ink);
+  background: var(--white);
   margin: 0;
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: #faf9f6;
-  color: #1c1917;
   overflow-x: hidden;
 }
 
-/* Luxury Light Card Styles */
-.glass-panel-light {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(254, 215, 170, 0.5); /* orange-200 / 50 */
-  box-shadow: 0 10px 30px -5px rgba(249, 115, 22, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+h1, h2, h3 {
+  font-family: 'Archivo Black', sans-serif;
+  text-transform: uppercase;
+  color: var(--forest);
+  line-height: 0.9;
+  letter-spacing: -0.01em;
 }
 
-.gradient-orange-card {
-  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%);
-  border: 1px solid rgba(251, 146, 60, 0.35);
-  box-shadow: 0 12px 32px -4px rgba(249, 115, 22, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+h1 {
+  font-size: clamp(3rem, 8.5vw, 6.5rem);
+}
+
+h2 {
+  font-size: clamp(2.25rem, 6vw, 4.5rem);
+}
+
+.hero {
+  background: var(--lime);
+  color: var(--forest);
+}
+
+.btn {
+  background: var(--forest);
+  color: var(--lime);
+  border-radius: var(--radius-pill);
+  padding: 0.9rem 1.6rem;
+  font-weight: 600;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px -4px rgba(22, 55, 1, 0.25);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.card {
+  border-radius: var(--radius-card);
+  background: var(--white);
+}
+
+.card--lime {
+  background: var(--lime);
+  color: var(--forest);
+}
+
+.card--dark {
+  background: var(--forest);
+  color: var(--lime);
+}
+
+/* Glass & Card Styles styled to the Wise Palette */
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(22, 55, 1, 0.08);
+  border-radius: var(--radius-card);
+  box-shadow: 0 10px 30px -5px rgba(22, 55, 1, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
 }
 
 .glass-pill-light {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--white);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(254, 215, 170, 0.6);
+  border: 1px solid rgba(22, 55, 1, 0.12);
+  border-radius: var(--radius-pill);
 }
 
 .glass-pill-light:hover {
-  background: #ffffff;
-  border-color: rgba(249, 115, 22, 0.5);
-}
-
-/* Light Glow Accents */
-.glow-emerald-light {
-  box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);
-}
-
-.glow-orange-light {
-  box-shadow: 0 0 20px rgba(249, 115, 22, 0.25);
+  background: var(--lime);
+  color: var(--forest);
+  border-color: var(--forest);
 }
 
 /* Scrollbar */
@@ -55,12 +110,12 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f5f5f4;
+  background: #f4f4f0;
 }
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--forest);
 }
