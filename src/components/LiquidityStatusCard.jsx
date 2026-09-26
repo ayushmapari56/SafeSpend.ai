@@ -11,7 +11,9 @@ export default function LiquidityStatusCard({
   onInjectShock,
   onRecalculate,
   onResetDemo,
-  isRecalculating
+  isRecalculating,
+  onOpenCustomSandbox,
+  customEventsCount = 0
 }) {
   const isSafe = status === 'SAFE';
   const isRestored = status === 'RESTORED';
@@ -88,6 +90,32 @@ export default function LiquidityStatusCard({
             </p>
             <span className="text-[10px] text-orange-600 font-mono font-semibold">Interactive Sandbox</span>
           </div>
+
+          {/* Primary Judge Custom Sandbox Banner Button */}
+          <button
+            onClick={onOpenCustomSandbox}
+            className="w-full mb-3 p-3.5 rounded-2xl bg-gradient-to-r from-[#163701] to-[#255503] hover:from-[#1b4301] hover:to-[#2e6804] text-white border border-[#A3F574]/30 shadow-md shadow-[#163701]/10 flex items-center justify-between transition-all duration-200 active:scale-[0.99] group"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-[#A3F574]/20 flex items-center justify-center text-[#A3F574] group-hover:scale-110 transition-transform">
+                <Zap className="w-4 h-4 fill-current" />
+              </div>
+              <div className="text-left">
+                <div className="text-xs font-bold font-sora flex items-center gap-1.5">
+                  ⚡ Custom Transaction Sandbox
+                  <span className="px-2 py-0.2 rounded-full bg-[#A3F574] text-[#163701] text-[9px] font-mono font-black uppercase">
+                    Judge Live Demo
+                  </span>
+                </div>
+                <div className="text-[10px] text-white/75 font-sans">
+                  Feed any custom ₹ bill, shock or income live
+                </div>
+              </div>
+            </div>
+            <span className="text-xs font-mono font-bold text-[#A3F574] group-hover:translate-x-1 transition-transform">
+              {customEventsCount > 0 ? `${customEventsCount} Added →` : 'Inject Custom →'}
+            </span>
+          </button>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* Inject Income Delay Button */}

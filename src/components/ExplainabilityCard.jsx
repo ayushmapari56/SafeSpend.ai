@@ -13,6 +13,8 @@ export default function ExplainabilityCard({
   onApproveAction,
   onOpenSplitModal,
   onRejectAction,
+  backendExplanation = '',
+  backendAction = null,
 }) {
   const isWarning = status === 'WARNING' || incomeDelayDays > 0 || expenseShockAmount > 0;
   const isRestored = isOttPaused || splitPaymentActive;
@@ -129,10 +131,16 @@ export default function ExplainabilityCard({
             </div>
 
             <p className="text-sm font-bold text-stone-900 font-sora">
-              Recommendation: <span className="text-orange-700">Pause OTT & Shopping Auto-Debits (Saves ₹1,499 instantly)</span>
+              Recommendation: <span className="text-orange-700">
+                {backendAction && backendAction.title && backendAction.action_id !== 'ACT_NONE'
+                  ? backendAction.title
+                  : 'Pause OTT & Shopping Auto-Debits (Saves ₹1,499 instantly)'}
+              </span>
             </p>
             <p className="text-xs text-stone-500 font-sans">
-              Postpones non-essential subscription payments until Oct 12 when college stipend is credited.
+              {backendAction && backendAction.impact && backendAction.action_id !== 'ACT_NONE'
+                ? backendAction.impact
+                : 'Postpones non-essential subscription payments until Oct 12 when college stipend is credited.'}
             </p>
           </div>
 
