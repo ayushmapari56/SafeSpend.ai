@@ -160,15 +160,40 @@ export default function App() {
    * Apply backend response to all relevant local state.
    */
   const applyBackendData = useCallback((data) => {
+    if (!data) return;
     const mapped = mapBackendResponse(data);
     setLiquidBalance(mapped.liquidBalance);
     setSafetyBuffer(mapped.safetyBuffer);
     setBackendSafeToSpend(mapped.safeToSpendDaily);
-    if (mapped.projectionData.length > 0) {
+    if (mapped.projectionData && mapped.projectionData.length > 0) {
       setBackendProjection(mapped.projectionData);
     }
     setBackendExplanation(mapped.explanation);
     setBackendAction(mapped.recommendedAction);
+
+    // Sync disturbance and learning flags from live backend state
+    const hasShock = (data.expense_events || []).some(e => e.name === 'Emergency Medical Shock');
+    setExpenseShockAmount((prev) => {
+      // If shock was active and just got resolved from Telegram:
+      if (prev > 0 && !hasShock) {
+        showToast('⚡ Telegram Synced: Emergency Shock Resolved by User via Telegram!');
+        addLog('ACTION_EXECUTED', 'TELEGRAM_APPROVE_SYNCED', 'Approved via Telegram! Emergency Shock cleared from cashflow buffer.', '99.1%');
+        confetti({ particleCount: 50, spread: 60, origin: { y: 0.85 } });
+      }
+      return hasShock ? 3500 : 0;
+    });
+
+    const hasDelay = (data.income_events || []).some(e => (e.probability ?? 1.0) < 0.9);
+    setIncomeDelayDays(hasDelay ? 5 : 0);
+
+    const isRejected = Boolean(data.user_preferences?.rejected_cancellation);
+    setActionRejected((prev) => {
+      if (!prev && isRejected) {
+        showToast('⚡ Telegram Synced: User Preference Logged! Model Adapted to Rent Splitting.');
+        addLog('ACTION_EXECUTED', 'TELEGRAM_REJECT_SYNCED', 'Rejected via Telegram. LangGraph adapted strategy to payment splitting.', '98.5%');
+      }
+      return isRejected;
+    });
   }, []);
 
   // On mount — check if backend is reachable and load initial state
@@ -179,22 +204,44 @@ export default function App() {
         await api.healthCheck();
         if (cancelled) return;
         setBackendOnline(true);
-        addLog('INFO', 'BACKEND_CONNECTED', 'FastAPI engine connected at localhost:8000. LangGraph agent workflow online.');
+        addLog('INFO', 'BACKEND_CONNECTED', 'FastAPI engine connected. LangGraph agent workflow online.');
 
         // Load baseline state from backend
         const data = await api.fetchState();
         if (cancelled) return;
         applyBackendData(data);
-        addLog('INFO', 'AGENT_STATE_LOADED', 'Loaded computed state from production agent engine (observer → explainer pipeline).');
+        addLog('INFO', 'AGENT_STATE_LOADED', 'Loaded computed state from production agent engine.');
       } catch {
         if (cancelled) return;
         setBackendOnline(false);
-        addLog('WARN', 'BACKEND_OFFLINE', 'FastAPI backend not reachable. Running in frontend-only offline mode with local projections.');
+        addLog('WARN', 'BACKEND_OFFLINE', 'FastAPI backend not reachable. Running in frontend-only offline mode.');
       }
     }
     init();
     return () => { cancelled = true; };
   }, [applyBackendData]);
+
+  // Real-Time Polling: Periodically sync with backend every 2s (picks up Telegram Approve/Reject clicks instantly)
+  useEffect(() => {
+    if (!backendOnline) return;
+
+    let isMounted = true;
+    const interval = setInterval(async () => {
+      if (isLoading || isRecalculating) return;
+      try {
+        const data = await api.fetchState();
+        if (!isMounted) return;
+        applyBackendData(data);
+      } catch {
+        // quiet fallback
+      }
+    }, 2000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [backendOnline, isLoading, isRecalculating, applyBackendData]);
 
   // Derive dynamic Safe-to-Spend Daily rate (fallback when backend is offline)
   const localSafeToSpendDaily = useMemo(() => {
