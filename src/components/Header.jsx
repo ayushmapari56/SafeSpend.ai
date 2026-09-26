@@ -7,7 +7,8 @@ export default function Header({
   onResetDemo, 
   hasAlert, 
   alertCount, 
-  onOpenNotifications 
+  onOpenNotifications,
+  onOpenCustomSandbox 
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -70,6 +71,17 @@ export default function Header({
 
           {/* RIGHT: Actions */}
           <div className="flex items-center gap-2 shrink-0">
+            {/* Custom Sandbox Modal Trigger */}
+            <button
+              onClick={onOpenCustomSandbox}
+              title="Live Custom Transaction Sandbox for Judges"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs font-bold transition-all active:scale-95 shadow-sm shadow-orange-500/20"
+            >
+              <Zap className="w-3.5 h-3.5 fill-current" />
+              <span className="hidden sm:inline">Feed Custom Event</span>
+              <span className="sm:hidden">Sandbox</span>
+            </button>
+
             {/* Reset Demo */}
             <button
               onClick={onResetDemo}

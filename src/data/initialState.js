@@ -90,6 +90,21 @@ export function calculate14DayProjection(state) {
       currentBal += 2000;
     }
 
+    // Dynamic Custom Events added during live Judge Demo
+    if (state.customEvents && state.customEvents.length > 0) {
+      for (const evt of state.customEvents) {
+        if (evt.day === dayNum) {
+          const amt = Number(evt.amount) || 0;
+          if (evt.type === 'INCOME') {
+            const prob = evt.probability !== undefined ? Number(evt.probability) : 1.0;
+            currentBal += amt * prob;
+          } else {
+            currentBal -= amt;
+          }
+        }
+      }
+    }
+
     const isBelowBuffer = currentBal < safetyBuffer;
 
     days.push({

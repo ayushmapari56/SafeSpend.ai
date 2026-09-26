@@ -21,8 +21,5 @@ venv/
 .venv/
 ENV/
 
-# IDE / OS
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
+# Backend local directory on frontend branch
+safespend-backend/
