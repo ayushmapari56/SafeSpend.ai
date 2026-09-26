@@ -1,15 +1,3 @@
-# Node / Web
-node_modules/
-dist/
-build/
-.env
-.env.local
-.env.*.local
-*.log
-npm-debug.log*
-yarn-debug.log*
-pnpm-debug.log*
-
 # Python
 __pycache__/
 *.py[cod]
@@ -20,9 +8,22 @@ env/
 venv/
 .venv/
 ENV/
+*.egg-info/
+dist/
+build/
+
+# Node / Vite cache (if any)
+.vite/
+safespend-backend/
+node_modules/
+
+# Environment variables
+.env
+.env.local
 
 # IDE / OS
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
+*.log
