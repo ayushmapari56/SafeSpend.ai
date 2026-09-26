@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
 from agent_workflow import agent_engine
-from telegram_service import send_telegram_shortfall_alert
+from telegram_service import send_telegram_shortfall_alert, start_telegram_listener
 
 app = FastAPI(title="Safespend.ai Production Engine")
 
@@ -37,8 +37,32 @@ INITIAL_SESSION = {
 
 demo_session = copy.deepcopy(INITIAL_SESSION)
 
+
+def process_telegram_feedback(action: str):
+    """Callback triggered whenever user clicks APPROVE or REJECT in Telegram."""
+    global demo_session
+    print(f"⚡ [Main Engine] Handling Telegram Feedback Signal: {action}")
+    if action == "REJECT":
+        demo_session["user_preferences"]["rejected_cancellation"] = True
+    elif action == "APPROVE":
+        # Resolve shock event upon approval
+        demo_session["expense_events"] = [
+            e for e in demo_session["expense_events"] if e["name"] != "Emergency Medical Shock"
+        ]
+    output = agent_engine.invoke(demo_session)
+    return output
+
+
+@app.on_event("startup")
+def on_startup():
+    """Start background Telegram event loop on server start."""
+    start_telegram_listener(process_telegram_feedback)
+    print("🚀 [SafeSpend.ai] FastAPI Engine & Telegram Interactive Listener active!")
+
+
 class FeedbackModel(BaseModel):
     action: str  # "APPROVE" or "REJECT"
+
 
 class CustomEventModel(BaseModel):
     name: str
@@ -46,6 +70,7 @@ class CustomEventModel(BaseModel):
     type: str  # "INCOME" or "EXPENSE"
     probability: float = 1.0
     day: int = 3
+
 
 @app.get("/")
 def root():
@@ -55,15 +80,18 @@ def root():
         "docs_url": "/docs"
     }
 
+
 @app.get("/health")
 def health():
     return {"status": "healthy"}
+
 
 @app.get("/api/state")
 def get_current_state():
     """Step 1: Baseline State Query."""
     output = agent_engine.invoke(demo_session)
     return output
+
 
 @app.post("/api/inject-delay")
 def inject_income_delay():
@@ -77,6 +105,7 @@ def inject_income_delay():
             output.get("recommended_action", {}).get("title", "Action Required")
         )
     return output
+
 
 @app.post("/api/add-expense")
 def add_expense_shock():
@@ -92,6 +121,7 @@ def add_expense_shock():
             output.get("recommended_action", {}).get("title", "Action Required")
         )
     return output
+
 
 @app.post("/api/custom-event")
 def inject_custom_event(event: CustomEventModel):
@@ -121,19 +151,13 @@ def inject_custom_event(event: CustomEventModel):
         )
     return output
 
+
 @app.post("/api/user-feedback")
 def process_user_feedback(feedback: FeedbackModel):
     """Step 8: Continuous Learning Cycle Handler."""
-    if feedback.action == "REJECT":
-        demo_session["user_preferences"]["rejected_cancellation"] = True
-    elif feedback.action == "APPROVE":
-        # Resolve shock event upon approval
-        demo_session["expense_events"] = [
-            e for e in demo_session["expense_events"] if e["name"] != "Emergency Medical Shock"
-        ]
-        
-    output = agent_engine.invoke(demo_session)
+    output = process_telegram_feedback(feedback.action)
     return output
+
 
 @app.post("/api/reset-demo")
 def reset_demo():
@@ -142,6 +166,7 @@ def reset_demo():
     demo_session = copy.deepcopy(INITIAL_SESSION)
     output = agent_engine.invoke(demo_session)
     return output
+
 
 if __name__ == "__main__":
     import uvicorn

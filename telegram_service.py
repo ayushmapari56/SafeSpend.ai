@@ -1,12 +1,13 @@
 # telegram_service.py
+import os
 import requests
 import time
 import threading
 from typing import Callable, Optional
 
-# Active Bot Token and Chat ID
-TELEGRAM_BOT_TOKEN = "8685599406:AAEelS0iT9wMdY65WTJayOExW33ehhIvNwk"
-TELEGRAM_CHAT_ID = "6599030186"
+# Active Bot Token and Chat ID (reads from ENV or default fallback)
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8685599406:AAEelS0iT9wMdY65WTJayOExW33ehhIvNwk")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "6599030186")
 
 last_update_id = 0
 _listener_started = False
@@ -69,12 +70,12 @@ def start_telegram_listener(feedback_callback_func: Callable[[str], None]):
 
     def poll_updates():
         global last_update_id
-        print("🤖 [Telegram Listener] Background Telegram Polling Loop Active!")
+        print("🤖 [Telegram Listener] Background Telegram Polling Loop Started!")
         while True:
             try:
                 url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/getUpdates"
-                params = {"offset": last_update_id + 1, "timeout": 2}
-                response = requests.get(url, params=params, timeout=6)
+                params = {"offset": last_update_id + 1, "timeout": 3}
+                response = requests.get(url, params=params, timeout=8)
                 if response.status_code == 200:
                     data = response.json()
                     for update in data.get("result", []):
@@ -85,25 +86,46 @@ def start_telegram_listener(feedback_callback_func: Callable[[str], None]):
                             cb = update["callback_query"]
                             action_data = cb.get("data")  # "APPROVE" or "REJECT"
                             cb_id = cb.get("id")
+                            chat_id = cb.get("message", {}).get("chat", {}).get("id", TELEGRAM_CHAT_ID)
 
-                            print(f"⚡ [Telegram Listener] Button Clicked on Phone: {action_data}")
+                            print(f"⚡ [Telegram Listener] Button Click Received: {action_data}")
 
-                            # Trigger Backend Learning Callback
+                            # 1. Trigger Backend Agent State Update & Learning
                             try:
                                 feedback_callback_func(action_data)
                             except Exception as err:
-                                print(f"[Telegram Listener] Error in callback: {err}")
+                                print(f"[Telegram Listener] Error in agent callback: {err}")
 
-                            # Acknowledge Telegram Popup Notification
+                            # 2. Acknowledge Telegram Button Popup Alert
                             try:
                                 ack_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/answerCallbackQuery"
-                                ack_text = "Action Approved!" if action_data == "APPROVE" else "Feedback Logged: Retraining Strategy!"
+                                ack_text = "✅ Action Approved & Applied!" if action_data == "APPROVE" else "🔀 Strategy Rejected! Model Retraining."
                                 requests.post(ack_url, json={
                                     "callback_query_id": cb_id,
-                                    "text": f"Safespend.ai: {ack_text}"
+                                    "text": ack_text,
+                                    "show_alert": True
                                 }, timeout=5)
-                            except Exception:
-                                pass
+                            except Exception as e:
+                                print(f"[Telegram Listener] Failed to answerCallbackQuery: {e}")
+
+                            # 3. Send Telegram Confirmation Message in Chat
+                            try:
+                                confirm_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+                                confirm_text = (
+                                    "✅ *Action Executed Successfully!*\n"
+                                    "SafeSpend engine has resolved the emergency shock and restored cashflow liquidity."
+                                    if action_data == "APPROVE" else
+                                    "🔀 *User Preference Recorded!*\n"
+                                    "LangGraph feedback cycle updated: Cancellation strategy rejected for future recommendations."
+                                )
+                                requests.post(confirm_url, json={
+                                    "chat_id": chat_id,
+                                    "text": confirm_text,
+                                    "parse_mode": "Markdown"
+                                }, timeout=5)
+                            except Exception as e:
+                                print(f"[Telegram Listener] Failed to send confirmation message: {e}")
+
             except Exception as e:
                 # Network glitch or timeout — wait and retry
                 time.sleep(1)
