@@ -50,6 +50,11 @@ function mapBackendResponse(data) {
     projectionData: trajectory,
     explanation: data.explanation || '',
     recommendedAction: data.recommended_action || {},
+    isOttPaused: data.is_ott_paused,
+    splitPaymentActive: data.split_payment_active,
+    actionRejected: data.action_rejected,
+    incomeDelayDays: data.income_delay_days,
+    expenseShockAmount: data.expense_shock_amount,
   };
 }
 
@@ -78,6 +83,11 @@ export default function App() {
   // Agent Brain Pipeline state — animates through LangGraph nodes during processing
   const [isBrainThinking, setIsBrainThinking] = useState(false);
   const [currentBrainStep, setCurrentBrainStep] = useState(0);
+
+  // References for live synchronization tracking
+  const lastSyncTimestampRef = React.useRef(0);
+  const lastVersionRef = React.useRef(0);
+  const isFirstLoadRef = React.useRef(true);
 
   // Animate through pipeline steps: Observer(1) → Predictor(2) → Explainer(3) → Intervener(4)
   const animateBrainPipeline = () => {
@@ -164,37 +174,89 @@ export default function App() {
     setLiquidBalance(mapped.liquidBalance);
     setSafetyBuffer(mapped.safetyBuffer);
     setBackendSafeToSpend(mapped.safeToSpendDaily);
-    if (mapped.projectionData.length > 0) {
+    if (mapped.projectionData && mapped.projectionData.length > 0) {
       setBackendProjection(mapped.projectionData);
     }
     setBackendExplanation(mapped.explanation);
     setBackendAction(mapped.recommendedAction);
+
+    if (mapped.isOttPaused !== undefined) setIsOttPaused(mapped.isOttPaused);
+    if (mapped.splitPaymentActive !== undefined) setSplitPaymentActive(mapped.splitPaymentActive);
+    if (mapped.actionRejected !== undefined) setActionRejected(mapped.actionRejected);
+    if (mapped.incomeDelayDays !== undefined) setIncomeDelayDays(mapped.incomeDelayDays);
+    if (mapped.expenseShockAmount !== undefined) setExpenseShockAmount(mapped.expenseShockAmount);
   }, []);
 
-  // On mount — check if backend is reachable and load initial state
+  // Continuous Live Sync Loop: Polls backend every 1000ms for instant Telegram button reflections
   useEffect(() => {
-    let cancelled = false;
-    async function init() {
-      try {
-        await api.healthCheck();
-        if (cancelled) return;
-        setBackendOnline(true);
-        addLog('INFO', 'BACKEND_CONNECTED', 'FastAPI engine connected at localhost:8000. LangGraph agent workflow online.');
+    let isSubscribed = true;
 
-        // Load baseline state from backend
+    async function syncLoop() {
+      try {
         const data = await api.fetchState();
-        if (cancelled) return;
-        applyBackendData(data);
-        addLog('INFO', 'AGENT_STATE_LOADED', 'Loaded computed state from production agent engine (observer → explainer pipeline).');
+        if (!isSubscribed) return;
+
+        setBackendOnline(true);
+        const serverVersion = data.version ?? 0;
+        const lastActionTs = data.last_action_timestamp ?? 0;
+
+        if (isFirstLoadRef.current) {
+          isFirstLoadRef.current = false;
+          lastVersionRef.current = serverVersion;
+          lastSyncTimestampRef.current = lastActionTs;
+          applyBackendData(data);
+          addLog('INFO', 'BACKEND_CONNECTED', 'FastAPI engine connected at localhost:8000. LangGraph agent workflow online.');
+          return;
+        }
+
+        // Check if state changed on backend (e.g. from Telegram button click or external event)
+        if (serverVersion !== lastVersionRef.current || (lastActionTs && lastActionTs !== lastSyncTimestampRef.current)) {
+          lastVersionRef.current = serverVersion;
+
+          // Check if Telegram action was triggered
+          if (lastActionTs && lastActionTs !== lastSyncTimestampRef.current) {
+            lastSyncTimestampRef.current = lastActionTs;
+
+            if (data.last_action === 'APPROVE') {
+              setIsOttPaused(true);
+              setActionRejected(false);
+              confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: ['#10b981', '#34d399', '#f97316'] });
+              showToast('⚡ Telegram Synchronized: Action Approved via Telegram!');
+              addLog('ACTION_EXECUTED', 'TELEGRAM_APPROVE_SYNC', '1-Click Telegram approval received. Auto-debit deferred and liquidity buffer restored.', '100%');
+              addNotification(
+                'Telegram: Remediation Approved',
+                'Action executed directly from Telegram 1-click button. Liquidity restored.',
+                'success'
+              );
+            } else if (data.last_action === 'REJECT') {
+              setActionRejected(true);
+              setIsOttPaused(false);
+              showToast('🔀 Telegram Synchronized: Rejected on Telegram — AI Model Adapted!');
+              addLog('LEARNING_CYCLE', 'TELEGRAM_REJECT_SYNC', 'Telegram rejection signal received. Continuous learning cycle updated: AI switched to Split Rent strategy.', '100%');
+              addNotification(
+                'Telegram: Strategy Adapted',
+                'User rejected cancellation via Telegram. AI recommended Rent Split installment plan.',
+                'info'
+              );
+            }
+          }
+
+          applyBackendData(data);
+        }
       } catch {
-        if (cancelled) return;
+        if (!isSubscribed) return;
         setBackendOnline(false);
-        addLog('WARN', 'BACKEND_OFFLINE', 'FastAPI backend not reachable. Running in frontend-only offline mode with local projections.');
       }
     }
-    init();
-    return () => { cancelled = true; };
+
+    syncLoop();
+    const interval = setInterval(syncLoop, 1000);
+    return () => {
+      isSubscribed = false;
+      clearInterval(interval);
+    };
   }, [applyBackendData]);
+
 
   // Derive dynamic Safe-to-Spend Daily rate (fallback when backend is offline)
   const localSafeToSpendDaily = useMemo(() => {

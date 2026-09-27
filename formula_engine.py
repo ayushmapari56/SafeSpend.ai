@@ -24,7 +24,8 @@ def calculate_safespend_14days(
     income_events: List[Dict[str, Any]],
     expense_events: List[Dict[str, Any]],
     safety_buffer: float = 2000.0,
-    daily_essential_burn: float = 350.0
+    daily_essential_burn: float = 350.0,
+    is_ott_paused: bool = False
 ) -> Dict[str, Any]:
     """
     Computes S_safe(t), daily Safe-to-Spend limits, and 14-day trajectory projections.
@@ -48,6 +49,10 @@ def calculate_safespend_14days(
     ])
     total_essential_burn = daily_essential_burn * 14.0
     sum_committed_expenses = sum_scheduled_expenses + total_essential_burn
+    
+    # If OTT / auto-debit deferred by defensive action, subtract ₹1,499
+    if is_ott_paused:
+        sum_committed_expenses = max(0.0, sum_committed_expenses - 1499.0)
 
     # 4. M_buffer: Minimum Safety Buffer Reserve
     m_buffer = float(safety_buffer)
@@ -70,10 +75,16 @@ def calculate_safespend_14days(
         ])
 
         # Outflows on day τ (scheduled commitments + daily living burn)
-        day_expenses = sum([
+        scheduled_day_exp = sum([
             float(e.get("amount", 0.0))
             for e in expense_events if e.get("day") == day
-        ]) + daily_essential_burn
+        ])
+        
+        # If OTT deferred, day 5 auto-debit is deferred
+        if is_ott_paused and day == 5:
+            scheduled_day_exp = max(0.0, scheduled_day_exp - 1499.0)
+
+        day_expenses = scheduled_day_exp + daily_essential_burn
 
         running_balance = running_balance + day_income - day_expenses
         daily_trajectory.append({
@@ -104,3 +115,4 @@ def calculate_safespend_14days(
         "shortfall_risk": shortfall_risk,
         "daily_trajectory": daily_trajectory
     }
+
