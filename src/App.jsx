@@ -221,7 +221,7 @@ export default function App() {
     return () => { cancelled = true; };
   }, [applyBackendData]);
 
-  // Real-Time Polling: Periodically sync with backend every 2s (picks up Telegram Approve/Reject clicks instantly)
+  // Real-Time Polling: Periodically sync with backend every 800ms (picks up Telegram Approve/Reject clicks near-instantly)
   useEffect(() => {
     if (!backendOnline) return;
 
@@ -235,7 +235,7 @@ export default function App() {
       } catch {
         // quiet fallback
       }
-    }, 2000);
+    }, 800);
 
     return () => {
       isMounted = false;
