@@ -12,6 +12,9 @@ class AgentState(TypedDict, total=False):
     math_result: Dict[str, Any]
     explanation: str
     recommended_action: Dict[str, Any]
+    is_ott_paused: bool
+    split_payment_active: bool
+    action_rejected: bool
 
 def observer_predictor_node(state: AgentState) -> Dict[str, Any]:
     """Executes the math engine and computes short-horizon liquidity."""
@@ -19,12 +22,14 @@ def observer_predictor_node(state: AgentState) -> Dict[str, Any]:
     income_events = list(state.get("income_events", []))
     expense_events = list(state.get("expense_events", []))
     safety_buffer = float(state.get("safety_buffer", 2000.0))
+    is_ott_paused = bool(state.get("is_ott_paused", False) or state.get("user_preferences", {}).get("is_ott_paused", False))
 
     res = calculate_safespend_14days(
         current_balance=current_balance,
         income_events=income_events,
         expense_events=expense_events,
-        safety_buffer=safety_buffer
+        safety_buffer=safety_buffer,
+        is_ott_paused=is_ott_paused
     )
     return {"math_result": res}
 
@@ -32,8 +37,20 @@ def explainer_intervener_node(state: AgentState) -> Dict[str, Any]:
     """Generates plain-language explainability and adapts actions based on feedback memory."""
     res = state.get("math_result", {})
     prefs = state.get("user_preferences", {})
+    is_ott_paused = bool(state.get("is_ott_paused", False) or prefs.get("is_ott_paused", False))
     
-    if res.get("shortfall_risk", False):
+    if is_ott_paused:
+        explanation = (
+            "Safety buffer restored! Auto-debit for OTT & non-essential subscriptions has been safely "
+            "deferred (+₹1,499 liquidity retained). Safe-to-Spend is stabilized."
+        )
+        recommended_action = {
+            "action_id": "ACT_RESOLVED",
+            "title": "Action Executed: Subscriptions Deferred",
+            "impact": "+₹1,499 liquidity protected. Safety buffer restored.",
+            "type": "SUBSCRIPTION_PAUSE"
+        }
+    elif res.get("shortfall_risk", False):
         explanation = (
             f"Cash shortfall warning! Your 14-day liquidity pool is projected at "
             f"₹{res.get('usable_liquidity_pool', 0):,.2f} (breaching your ₹{res.get('safety_buffer', 2000):,.0f} safety buffer). "
@@ -80,3 +97,4 @@ workflow.add_edge("observer", "explainer")
 workflow.add_edge("explainer", END)
 
 agent_engine = workflow.compile()
+
